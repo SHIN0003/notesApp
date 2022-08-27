@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">NotesApp</string>
+    <string name="enter_your_email">Enter Your Email</string>
+    <string name="enter_your_password" />
+</resources>
