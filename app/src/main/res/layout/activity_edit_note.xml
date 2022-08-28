@@ -50,9 +50,9 @@
         android:layout_marginRight="30dp"
         android:layout_gravity = "bottom|end"
         android:id="@+id/saveeditnote"
-        android:src="@drawable/pencil"
-        android:background="#000000"
-        app:maxImageSize="30dp"
+        android:src="@drawable/ic_baseline_arrow_circle_up_24"
+        android:background="#A1F4AB"
+        app:maxImageSize="40dp"
 
         >
     </com.google.android.material.floatingactionbutton.FloatingActionButton>

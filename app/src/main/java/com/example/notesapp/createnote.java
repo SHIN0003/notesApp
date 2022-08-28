@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -30,6 +31,7 @@ public class createnote extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
     FirebaseFirestore firebaseFirestore;
+    ProgressBar mprogressbarofcreanote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class createnote extends AppCompatActivity {
         msavenote = findViewById(R.id.savenote);
         mcreatecontentofnote = findViewById(R.id.createcontentofnote);
         mcreatetitleofnote = findViewById(R.id.createtitleofnote);
+        mprogressbarofcreanote = findViewById(R.id.progressbarofcreatenote);
 
         Toolbar toolbar = findViewById(R.id.toolbarofcreatenote);
         setSupportActionBar(toolbar);
@@ -59,7 +62,7 @@ public class createnote extends AppCompatActivity {
 
                 }
                 else {
-
+                    mprogressbarofcreanote.setVisibility(View.VISIBLE);
                     DocumentReference documentReference = firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document();
                     Map<String, Object> note = new HashMap<>();
                     note.put("title", title);
@@ -68,12 +71,14 @@ public class createnote extends AppCompatActivity {
                         @Override
                         public void onSuccess(Void unused) {
                             Toast.makeText(getApplicationContext(), "Note Created", Toast.LENGTH_SHORT).show();
+                            mprogressbarofcreanote.setVisibility(View.INVISIBLE);
                             startActivity(new Intent(createnote.this, Notesactivity.class));
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Toast.makeText(getApplicationContext(), "Failed to create note", Toast.LENGTH_SHORT).show();
+                            mprogressbarofcreanote.setVisibility(View.INVISIBLE);
                         }
                     });
                 }

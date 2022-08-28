@@ -24,9 +24,12 @@ import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -53,6 +56,7 @@ public class Notesactivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
+        FirebaseModel bruh = new FirebaseModel();
         Objects.requireNonNull(getSupportActionBar()).setTitle("All Notes");
         mcreatenotesfab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,11 +78,16 @@ public class Notesactivity extends AppCompatActivity {
                 ImageView popupbutton = holder.itemView.findViewById(R.id.menupopbutton);
                 holder.notetitle.setText(model.getTitle());
                 holder.notecontent.setText(model.getContent());
+                String docId = noteAdapter.getSnapshots().getSnapshot(position).getId();
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         //we have to open note detail activity
+
                         Intent intent = new Intent(view.getContext(), NoteDetails.class);
+                        intent.putExtra("title", bruh.getTitle());
+                        intent.putExtra("content", bruh.getContent());
+                        intent.putExtra("noteId", docId);
                         view.getContext().startActivity(intent);
                     }
                 });
@@ -91,6 +100,9 @@ public class Notesactivity extends AppCompatActivity {
                             @Override
                             public boolean onMenuItemClick(MenuItem menuItem) {
                                 Intent intent = new Intent(view.getContext(), EditNoteActivity.class);
+                                intent.putExtra("title", bruh.getTitle());
+                                intent.putExtra("content", bruh.getContent());
+                                intent.putExtra("noteId", docId);
                                 view.getContext().startActivity(intent);
                                 return false;
                             }
@@ -98,7 +110,19 @@ public class Notesactivity extends AppCompatActivity {
                         popupMenu.getMenu().add("Delete").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                             @Override
                             public boolean onMenuItemClick(MenuItem menuItem) {
-                                Toast.makeText(view.getContext(), "This note is deleted", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(view.getContext(), "This note is deleted", Toast.LENGTH_SHORT).show();
+                                DocumentReference documentReference = firebaseFirestore.collection("notes").document(firebaseUser.getUid()).collection("myNotes").document(docId);
+                                documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Toast.makeText(view.getContext(), "This note is deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(view.getContext(), "Failed to Delete", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                                 return false;
                             }
                         });
